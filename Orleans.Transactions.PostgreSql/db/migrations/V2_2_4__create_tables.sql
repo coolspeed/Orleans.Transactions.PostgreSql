@@ -7,7 +7,7 @@ CREATE TABLE transaction_metadata
   PRIMARY KEY (state_id)
 );
 
-CREATE TABLE transaction_state
+CREATE TABLE transactional_state
 (
   state_id            VARCHAR(255)    NOT NULL,
   sequence_id         INT       NOT NULL,
