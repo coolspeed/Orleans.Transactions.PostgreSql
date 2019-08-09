@@ -20,7 +20,7 @@ namespace Orleans.Transactions.PostgreSql
             public TransactionalStateMetaData Value { get; set; }
         }
 
-        private class TransactionState : ITransactionStateEntity<TState>
+        private class TransactionalState : ITransactionStateEntity<TState>
         {
             public long SequenceId { get; set; }
             public string TransactionId { get; set; }
@@ -81,7 +81,7 @@ namespace Orleans.Transactions.PostgreSql
                     .GetAsync().ConfigureAwait(false);
 
                 // ReSharper disable once CoVariantArrayConversion
-                return results.Select(x => new TransactionState
+                return results.Select(x => new TransactionalState
                 {
                     SequenceId = x.sequence_id,
                     TransactionId = x.transaction_id,
@@ -139,7 +139,7 @@ namespace Orleans.Transactions.PostgreSql
                         throw new InvalidOperationException("Something went wrong while persisting existing state");
                 }
 
-                return new TransactionState
+                return new TransactionalState
                 {
                     Value = pendingState.State,
                     SequenceId = pendingState.SequenceId,
