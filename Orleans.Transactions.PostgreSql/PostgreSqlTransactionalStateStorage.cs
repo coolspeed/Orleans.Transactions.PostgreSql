@@ -219,6 +219,7 @@ namespace Orleans.Transactions.PostgreSql
             using (var connection = new NpgsqlConnection(_options.ConnectionString))
             {
                 await connection.OpenAsync();
+                connection.TypeMapper.UseJsonNet();
                 var compiler = new PostgresCompiler();
                 var db = new QueryFactory(connection, compiler);
                 return await execute(db);
