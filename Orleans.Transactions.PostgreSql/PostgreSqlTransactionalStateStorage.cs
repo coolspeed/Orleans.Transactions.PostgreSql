@@ -86,7 +86,7 @@ namespace Orleans.Transactions.PostgreSql
                     SequenceId = x.sequence_id,
                     TransactionId = x.transaction_id,
                     Timestamp = x.timestamp,
-                    Value = x.value,
+                    Value = JsonConvert.DeserializeObject<TState>(x.value, _jsonSettings),
                     TransactionManager =
                         JsonConvert.DeserializeObject<ParticipantId?>(x.transaction_manager, _jsonSettings)
                 }).ToArray();
@@ -100,6 +100,9 @@ namespace Orleans.Transactions.PostgreSql
             {
                 var transactionManager =
                     JsonConvert.SerializeObject(pendingState.TransactionManager, _jsonSettings);
+                var stateValue = pendingState.State != null
+                    ? JsonConvert.SerializeObject(pendingState.State, _jsonSettings)
+                    : null;
                 string stateTypeName = pendingState.State != null
                     ? pendingState.State.GetType().Name
                     : null;
@@ -115,7 +118,7 @@ namespace Orleans.Transactions.PostgreSql
                             _stateId,
                             pendingState.SequenceId,
                             transactionManager,
-                            pendingState.State,
+                            stateValue,
                             pendingState.TimeStamp,
                             pendingState.TransactionId,
                             stateTypeName
@@ -129,7 +132,7 @@ namespace Orleans.Transactions.PostgreSql
                         .AsUpdate(new[] {"transaction_manager", "value", "timestamp", "transaction_id", "state_type" }, new object[]
                         {
                             transactionManager,
-                            pendingState.State,
+                            stateValue,
                             pendingState.TimeStamp,
                             pendingState.TransactionId,
                             stateTypeName
@@ -216,7 +219,6 @@ namespace Orleans.Transactions.PostgreSql
             using (var connection = new NpgsqlConnection(_options.ConnectionString))
             {
                 await connection.OpenAsync();
-                connection.TypeMapper.UseJsonNet();
                 var compiler = new PostgresCompiler();
                 var db = new QueryFactory(connection, compiler);
                 return await execute(db);
