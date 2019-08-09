@@ -15,6 +15,6 @@ CREATE TABLE transactional_state
   value               JSON,
   timestamp           TIMESTAMP     NOT NULL,
   transaction_id      VARCHAR(255)  NOT NULL,
-  state_type          VARCHAR(255)  NOT NULL,
+  state_type          VARCHAR(255),
   PRIMARY KEY (state_id, sequence_id)
 );
