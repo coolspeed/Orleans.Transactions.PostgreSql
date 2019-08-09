@@ -12,7 +12,7 @@ CREATE TABLE transactional_state
   state_id            VARCHAR(255)  NOT NULL,
   sequence_id         INT           NOT NULL,
   transaction_manager TEXT          NOT NULL,
-  value               TEXT          NOT NULL,
+  value               JSON          NOT NULL,
   timestamp           TIMESTAMP     NOT NULL,
   transaction_id      VARCHAR(255)  NOT NULL,
   state_type          VARCHAR(255)  NOT NULL,
