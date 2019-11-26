@@ -364,12 +364,15 @@ namespace Orleans.Transactions.PostgreSql
                     var rowsUpdated = await db.Query(_stateTableName)
                         .Where("state_id", _stateId)
                         .Where("sequence_id", state.SequenceId)
-                        .AsUpdate(new[] {"transaction_manager", "value", "timestamp", "transaction_id"}, new object[]
+                        .AsUpdate(
+                            new[] {"transaction_manager", "value", "timestamp", "transaction_id", "state_type" }, 
+                            new object[]
                         {
                             transactionManager,
                             stateValue,
                             state.Timestamp,
-                            state.TransactionId
+                            state.TransactionId,
+                            state.GetType().FullName
                         })
                         .FirstOrDefaultAsync<int>().ConfigureAwait(false);
                     if (rowsUpdated != 1)
@@ -393,7 +396,8 @@ namespace Orleans.Transactions.PostgreSql
                 {
                     await db.Query(_stateTableName).AsInsert(new[]
                             {
-                                "state_id", "sequence_id", "transaction_manager", "value", "timestamp", "transaction_id"
+                                "state_id", "sequence_id", "transaction_manager", "value", "timestamp", "transaction_id",
+                                "state_type"
                             },
                             _insertStateBuffer.Select(CreatePropertyBagForInsert).ToArray())
                         .FirstOrDefaultAsync().ConfigureAwait(false);;
@@ -412,7 +416,8 @@ namespace Orleans.Transactions.PostgreSql
                     transactionManager,
                     stateValue,
                     state.Timestamp,
-                    state.TransactionId
+                    state.TransactionId,
+                    state.GetType().FullName
                 };
             }
 
