@@ -104,7 +104,7 @@ namespace Orleans.Transactions.PostgreSql
                     ? JsonConvert.SerializeObject(pendingState.State, _jsonSettings)
                     : null;
                 string stateTypeName = pendingState.State != null
-                    ? pendingState.State.GetType().Name
+                    ? pendingState.State.GetType().FullName
                     : null;
 
                 if (existingState == null)
