@@ -18,7 +18,3 @@ CREATE TABLE transactional_state
   state_type          VARCHAR(255),
   PRIMARY KEY (state_id, sequence_id)
 );
-
-CREATE INDEX idx_state_type
-    ON transactional_state USING btree
-    (state_type);
