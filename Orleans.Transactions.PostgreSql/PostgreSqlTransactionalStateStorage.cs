@@ -103,15 +103,12 @@ namespace Orleans.Transactions.PostgreSql
                 var stateValue = pendingState.State != null
                     ? JsonConvert.SerializeObject(pendingState.State, _jsonSettings)
                     : null;
-                string stateTypeName = pendingState.State != null
-                    ? pendingState.State.GetType().FullName
-                    : null;
 
                 if (existingState == null)
                 {
                     await db.Query(_options.StateTableName).AsInsert(new[]
                         {
-                            "state_id", "sequence_id", "transaction_manager", "value", "timestamp", "transaction_id", "state_type"
+                            "state_id", "sequence_id", "transaction_manager", "value", "timestamp", "transaction_id"
                         },
                         new object[]
                         {
@@ -120,8 +117,7 @@ namespace Orleans.Transactions.PostgreSql
                             transactionManager,
                             stateValue,
                             pendingState.TimeStamp,
-                            pendingState.TransactionId,
-                            stateTypeName
+                            pendingState.TransactionId
                         }).FirstOrDefaultAsync();
                 }
                 else
@@ -129,13 +125,13 @@ namespace Orleans.Transactions.PostgreSql
                     var rowsUpdated = await db.Query(_options.StateTableName)
                         .Where("state_id", _stateId)
                         .Where("sequence_id", existingState.SequenceId)
-                        .AsUpdate(new[] {"transaction_manager", "value", "timestamp", "transaction_id", "state_type" }, new object[]
+                        .AsUpdate(new[] {"transaction_manager", "value", "timestamp", "transaction_id", "state_type" }, 
+                            new object[]
                         {
                             transactionManager,
                             stateValue,
                             pendingState.TimeStamp,
-                            pendingState.TransactionId,
-                            stateTypeName
+                            pendingState.TransactionId
                         }).FirstOrDefaultAsync<int>();
 
                     if (rowsUpdated != 1)

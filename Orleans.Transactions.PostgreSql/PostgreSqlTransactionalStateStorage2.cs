@@ -364,15 +364,13 @@ namespace Orleans.Transactions.PostgreSql
                     var rowsUpdated = await db.Query(_stateTableName)
                         .Where("state_id", _stateId)
                         .Where("sequence_id", state.SequenceId)
-                        .AsUpdate(
-                            new[] {"transaction_manager", "value", "timestamp", "transaction_id", "state_type" }, 
+                        .AsUpdate(new[] {"transaction_manager", "value", "timestamp", "transaction_id"}, 
                             new object[]
                         {
                             transactionManager,
                             stateValue,
                             state.Timestamp,
-                            state.TransactionId,
-                            state.GetType().FullName
+                            state.TransactionId
                         })
                         .FirstOrDefaultAsync<int>().ConfigureAwait(false);
                     if (rowsUpdated != 1)
@@ -395,10 +393,7 @@ namespace Orleans.Transactions.PostgreSql
                 await _dbExecuter.ExecuteQuery(async db =>
                 {
                     await db.Query(_stateTableName).AsInsert(new[]
-                            {
-                                "state_id", "sequence_id", "transaction_manager", "value", "timestamp", "transaction_id",
-                                "state_type"
-                            },
+                            {"state_id", "sequence_id", "transaction_manager", "value", "timestamp", "transaction_id"},
                             _insertStateBuffer.Select(CreatePropertyBagForInsert).ToArray())
                         .FirstOrDefaultAsync().ConfigureAwait(false);;
                 });
@@ -416,8 +411,7 @@ namespace Orleans.Transactions.PostgreSql
                     transactionManager,
                     stateValue,
                     state.Timestamp,
-                    state.TransactionId,
-                    state.GetType().FullName
+                    state.TransactionId
                 };
             }
 
